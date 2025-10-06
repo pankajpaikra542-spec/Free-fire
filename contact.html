@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.65">
+    <title>Contact Us - FreeFire Tournaments</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0c0c1d, #1a1a2e);
+            color: #fff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: rgba(10, 10, 25, 0.9);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, #8a3ffd, #6a11cb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        nav a:hover, nav a.active {
+            color: #8a3ffd;
+            background: rgba(138, 63, 253, 0.1);
+        }
+
+        .contact-section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #fff;
+        }
+        
+        .section-title span {
+            color: #8a3ffd;
+        }
+        
+        .contact-content {
+            background: rgba(30, 30, 45, 0.7);
+            border-radius: 15px;
+            padding: 3rem;
+        }
+        
+        .contact-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .contact-header h3 {
+            font-size: 2rem;
+            color: #8a3ffd;
+            margin-bottom: 1rem;
+        }
+        
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .contact-card {
+            background: rgba(42, 42, 60, 0.7);
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .contact-card i {
+            font-size: 2.5rem;
+            color: #8a3ffd;
+            margin-bottom: 1rem;
+        }
+        
+        .contact-card h5 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+        
+        .contact-card p {
+            color: #b0b0c0;
+        }
+        
+        .contact-form {
+            background: rgba(42, 42, 60, 0.7);
+            border-radius: 10px;
+            padding: 2rem;
+        }
+        
+        .contact-form h4 {
+            color: #8a3ffd;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #b0b0c0;
+        }
+        
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(30, 30, 45, 0.7);
+            border: 1px solid rgba(138, 63, 253, 0.3);
+            border-radius: 5px;
+            color: white;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #8a3ffd;
+            transform: scale(1.02);
+        }
+        
+        .form-group textarea {
+            height: 150px;
+            resize: vertical;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: #8a3ffd;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #6a11cb;
+            transform: translateY(-3px);
+        }
+        
+        .faq-section {
+            margin-top: 3rem;
+        }
+        
+        .faq-section h4 {
+            color: #8a3ffd;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+        
+        .faq-item {
+            background: rgba(42, 42, 60, 0.7);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .faq-item:hover {
+            background: rgba(42, 42, 60, 0.9);
+        }
+        
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            font-weight: 600;
+        }
+        
+        .faq-answer {
+            color: #b0b0c0;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .faq-item.active .faq-answer {
+            display: block;
+        }
+
+        footer {
+            background: rgba(10, 10, 25, 0.9);
+            padding: 3rem 2rem 1rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-column h3 {
+            color: #8a3ffd;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+
+        .footer-column p {
+            color: #b0b0c0;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(30, 30, 45, 0.7);
+            border-radius: 50%;
+            color: #8a3ffd;
+            transition: all 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            background: #8a3ffd;
+            color: white;
+            transform: translateY(-3px);
+        }
+        /* Specific hover colors for each social media */
+        .social-icons a.facebook:hover {
+            background: #3b5998;
+        }
+
+        .social-icons a.youtube:hover {
+            background: #ff0000;
+        }
+
+        .social-icons a.whatsapp:hover {
+            background: #25D366;
+        }
+
+        .social-icons a.instagram:hover {
+            background: #E1306C;
+        }
+
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-column ul li a {
+            color: #b0b0c0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-column ul li a:hover {
+            color: #8a3ffd;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(30, 30, 45, 0.7);
+            color: #b0b0c0;
+            font-size: 0.9rem;
+            max-width: 1200px;
+            margin: 2rem auto 0;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            nav ul {
+                gap: 1rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .contact-content {
+                padding: 2rem 1.5rem;
+            }
+            
+            .contact-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <i class="fas fa-fire fa-2x" style="color: #8a3ffd;"></i>
+            <h1>FreeFire Tournaments</h1>
+        </div>
+        <nav>
+    <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="tournament.html">Tournaments</a></li>
+        <li><a href="rewards.html">Rewards</a></li>
+        <li><a href="contact.html">Contact</a></li> <!-- Add this line -->
+        <li><a href="wallet.html">Wallet</a></li>
+    </ul>
+</nav>
+    </header>
+
+    <section class="contact-section">
+        <h2 class="section-title">Contact <span>Us</span></h2>
+        
+        <div class="contact-content">
+            <div class="contact-header">
+                <h3>Get In Touch</h3>
+                <p>We're here to help with any questions about our tournaments or platform</p>
+            </div>
+            
+            <div class="contact-info">
+                <div class="contact-card">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h5>Our Address</h5>
+                    <p>Ambikapur<br>chhattisgarh,<br>India - 497001</p>
+                </div>
+                
+                <div class="contact-card">
+                    <i class="fas fa-phone"></i>
+                    <h5>Phone Number</h5>
+                    <p>+91 6267348521<br>Mon-Sun: 10AM - 10PM</p>
+                </div>
+                
+                <div class="contact-card">
+                    <i class="fas fa-envelope"></i>
+                    <h5>Email Address</h5>
+                    <p>pankajpaikra63@gmail.com</p>
+                </div>
+                
+                <div class="contact-card">
+                    <i class="fas fa-clock"></i>
+                    <h5>Business Hours</h5>
+                    <p>Monday - Sunday: 10:00 AM - 10:00 PM<br>Customer Support: 24/7</p>
+                </div>
+            </div>
+            
+            <div class="contact-form">
+                <h4>Send us a Message</h4>
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="name">Your Name</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <select id="subject" required>
+                            <option value="">Select a subject</option>
+                            <option value="Tournament Query">Tournament Query</option>
+                            <option value="Payment Issue">Payment Issue</option>
+                            <option value="Technical Support">Technical Support</option>
+                            <option value="Partnership">Partnership</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Your Message</label>
+                        <textarea id="message" required></textarea>
+                    </div>
+                    
+                    <button type="button" class="btn" id="sendEmailBtn">Send Message</button>
+                </form>
+            </div>
+            
+            <div class="faq-section">
+                <h4>Frequently Asked Questions</h4>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>How do I register for a tournament?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Go to the Tournaments page, select a tournament you want to join, and click the "Register" button. You'll need to complete the payment process to secure your spot.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>When will I receive my prize money?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Prize money is typically processed within 24-48 hours after tournament completion. You'll receive a confirmation email once the payment has been initiated.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>What payment methods do you accept?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We accept all major payment methods including UPI, credit/debit cards, net banking, and popular digital wallets through our secure payment gateway.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>FreeFire Tournaments</h3>
+                <p>Join the ultimate competitive platform for FreeFire players. Show your skills, win prizes, and become a champion!</p>
+                <div class="social-icons">
+                    <a href="https://facebook.com" target="_blank" class="facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="https://youtube.com" target="_blank" class="youtube">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    <a href="https://whatsapp.com/channel/0029Vb72lw9JuyAJ9m3hOE1m" target="_blank" class="whatsapp">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                    <a href="https://instagram.com" target="_blank" class="instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="footer-column">
+                    <h3>Quick Links</h3>
+                       <ul>
+                           <li><a href="index.html">Home</a></li>
+                           <li><a href="tournament.html">Tournaments</a></li>
+                           <li><a href="rewards.html">Rewards</a></li>
+                           <li><a href="registrations.html">Registrations</a></li> <!-- Add this line -->
+                           <li><a href="contact.html">Contact</a></li>
+                       </ul>
+                </div>
+        <div class="copyright">
+            <p>&copy; Organised by BCA 1st Semester Students.</p>
+        </div>
+    </footer>
+
+    <script>
+        // JS Navigation for Header and Footer Links
+        document.querySelectorAll('nav a, .footer-column ul li a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Only prevent default if it's an internal page link (has data-page)
+                if (this.dataset.page) {
+                    e.preventDefault();
+                    window.location.href = this.dataset.page;
+                }
+            });
+        });
+
+        // Open Gmail or default email client with pre-filled message
+        document.getElementById('sendEmailBtn').addEventListener('click', function() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+
+            if(!name || !email || !subject || !message){
+                alert('Please fill in all fields!');
+                return;
+            }
+
+            const mailtoLink = `mailto:pankajpaikra63@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent("Name: " + name + "\nEmail: " + email + "\n\nMessage:\n" + message)}`;
+
+            window.location.href = mailtoLink;
+        });
+
+        document.getElementById('newsletterForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = this.querySelector('input[type="email"]').value;
+            alert(`Thank you for subscribing with ${email}! You'll receive tournament updates.`);
+            this.reset();
+        });
+
+        // FAQ functionality
+        const faqItems = document.querySelectorAll('.faq-item');
+         faqItems.forEach(item => {
+            item.addEventListener('click', () => {
+                item.classList.toggle('active');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.65">
+    <title>Rewards - FreeFire Tournaments</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0c0c1d, #1a1a2e);
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        /* Header Styles - Removed sticky positioning */
+        header {
+            background: rgba(10, 10, 25, 0.9);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #8a3ffd;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, #8a3ffd, #6a11cb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        nav a:hover, nav a.active {
+            color: #8a3ffd;
+            background: rgba(138, 63, 253, 0.1);
+        }
+
+        /* Rewards Section */
+        .rewards-section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #fff;
+        }
+        
+        .section-title span {
+            color: #8a3ffd;
+        }
+        
+        .rewards-info {
+            background: #1e1e2d;
+            border-radius: 15px;
+            padding: 3rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .rewards-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .rewards-header h3 {
+            font-size: 2rem;
+            color: #8a3ffd;
+            margin-bottom: 1rem;
+        }
+        
+        .rewards-header p {
+            font-size: 1.1rem;
+            color: #b0b0c0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .rewards-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .reward-category {
+            background: #2a2a3c;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .reward-category:hover {
+            transform: translateY(-5px);
+        }
+        
+        .category-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(138, 63, 253, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .category-icon i {
+            font-size: 2.5rem;
+            color: #8a3ffd;
+        }
+        
+        .reward-category h4 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+        
+        .reward-category p {
+            color: #b0b0c0;
+            margin-bottom: 1.5rem;
+        }
+        
+        .reward-category ul {
+            list-style: none;
+            text-align: left;
+        }
+        
+        .reward-category ul li {
+            padding: 0.5rem 0;
+            color: #b0b0c0;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .reward-category ul li:before {
+            content: "✓";
+            color: #8a3ffd;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        
+        .rewards-how-to {
+            background: #2a2a3c;
+            border-radius: 10px;
+            padding: 2rem;
+        }
+        
+        .rewards-how-to h3 {
+            font-size: 1.8rem;
+            color: #8a3ffd;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .rewards-how-to ol {
+            padding-left: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .rewards-how-to ol li {
+            padding: 0.8rem 0;
+            color: #b0b0c0;
+            font-size: 1.1rem;
+        }
+        
+        /* Footer */
+        footer {
+            background: #0a0a19;
+            padding: 3rem 2rem 1rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-column h3 {
+            color: #8a3ffd;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+
+        .footer-column p {
+            color: #b0b0c0;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: #1e1e2d;
+            border-radius: 50%;
+            color: #8a3ffd;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-icons a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(138, 63, 253, 0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .social-icons a:hover::before {
+            left: 100%;
+        }
+
+        .social-icons a:hover {
+            background: #8a3ffd;
+            color: white;
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 5px 15px rgba(138, 63, 253, 0.4);
+        }
+
+        /* Specific hover colors for each social media */
+        .social-icons a.facebook:hover {
+            background: #3b5998;
+        }
+
+        .social-icons a.youtube:hover {
+            background: #ff0000;
+        }
+
+        .social-icons a.whatsapp:hover {
+            background: #25D366;
+        }
+
+        .social-icons a.instagram:hover {
+            background: #E1306C;
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-column ul li a {
+            color: #b0b0c0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-column ul li a:hover {
+            color: #8a3ffd;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid #1e1e2d;
+            color: #b0b0c0;
+            font-size: 0.9rem;
+            max-width: 1200px;
+            margin: 2rem auto 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            nav ul {
+                gap: 1rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .rewards-info {
+                padding: 2rem 1.5rem;
+            }
+            
+            .rewards-categories {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header - No longer sticky/fixed -->
+    <header>
+        <div class="logo">
+            <i class="fas fa-fire fa-2x" style="color: #8a3ffd;"></i>
+            <h1>FreeFire Tournaments</h1>
+        </div>
+        <nav>
+    <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="tournament.html">Tournaments</a></li>
+        <li><a href="rewards.html">Rewards</a></li>
+        <li><a href="contact.html">Contact</a></li> <!-- Add this line -->
+        <li><a href="wallet.html">Wallet</a></li>
+    </ul>
+</nav>
+    </header>
+
+    <!-- Rewards Section -->
+    <section class="rewards-section">
+        <h2 class="section-title">Tournament <span>Rewards</span></h2>
+        
+        <div class="rewards-info">
+            <div class="rewards-header">
+                <h3>Win Amazing Prizes</h3>
+                <p>Compete in our tournaments and win cash prizes, in-game items, and exclusive rewards!</p>
+            </div>
+            
+            <div class="rewards-categories">
+                <div class="reward-category">
+                    <div class="category-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <h4>Cash Prizes</h4>
+                    <p>Win real money that can be transferred to your bank account or digital wallet.</p>
+                    <ul>
+                        <li>Instant withdrawal Within 24 hrs</li>
+                        <li>Multiple payment options</li>
+                        <li>Secure transactions</li>
+                    </ul>
+                </div>
+                
+                <div class="reward-category">
+                    <div class="category-icon">
+                        <i class="fas fa-gem"></i>
+                    </div>
+                    <h4>In-Game Items</h4>
+                    <p>Exclusive FreeFire items like diamonds, characters, and pets.</p>
+                    <ul>
+                        <li>Redeem codes</li>
+                        <li>Exclusive characters</li>
+                        <li>Any Pets</li>
+                    </ul>
+                </div>
+                
+                <div class="reward-category">
+                    <div class="category-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h4>Exclusive Badges</h4>
+                    <p>Show off your achievements with special badges on your profile.</p>
+                    <ul>
+                        <li>Tournament winner badges</li>
+                        <li>Special recognition</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="rewards-how-to">
+                <h3>How to Claim Your Rewards</h3>
+                <ol>
+                    <li>Win a tournament or place in the top ranks</li>
+                    <li>Go to your profile page and check the "My Rewards" section</li>
+                    <li>Follow the instructions to claim your prize</li>
+                    <li>Cash prizes are typically processed within 24-48 hours</li>
+                    <li>In-game items are delivered directly to your FreeFire account</li>
+                    <li>And Cash prizes are Sent to your registered mobile no. while talking on whatsapp first and giving proof of being winner</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>FreeFire Tournaments</h3>
+                <p>Join the ultimate competitive platform for FreeFire players. Show your skills, win prizes, and become a champion!</p>
+                <div class="social-icons">
+                    <a href="https://facebook.com" target="_blank" class="facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="https://youtube.com" target="_blank" class="youtube">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    <a href="https://whatsapp.com/channel/0029Vb72lw9JuyAJ9m3hOE1m" target="_blank" class="whatsapp">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                    <a href="https://instagram.com" target="_blank" class="instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="footer-column">
+                    <h3>Quick Links</h3>
+                       <ul>
+                         <li><a href="index.html">Home</a></li>
+                         <li><a href="tournament.html">Tournaments</a></li>
+                         <li><a href="rewards.html">Rewards</a></li>
+                         <li><a href="registrations.html">Registrations</a></li> <!-- Add this line -->
+                         <li><a href="contact.html">Contact</a></li>
+                      </ul>
+             </div>
+        
+        <div class="copyright">
+            <p>&copy; Organised by BCA 1st Semester Students.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Newsletter form
+        document.getElementById('newsletterForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = this.querySelector('input[type="email"]').value;
+            alert(`Thank you for subscribing with ${email}! You'll receive tournament updates.`);
+            this.reset();
+        });
+    </script>
+</body>
+</html>

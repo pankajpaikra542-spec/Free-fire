@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.65">
+    <title>FreeFire Tournament</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    
+   <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <!-- ADD THIS LINE FOR FIRESTORE -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <!-- Basic Modal Styles - Consider moving this to style.css -->
+    
+</head>
+<style>
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px); /* Optional: blur background */
+        }
+
+        .modal-content {
+            background-color: #2a2a2a; /* Dark background for content */
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #555;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            position: relative;
+            color: #eee; /* Light text color */
+            text-align: center;
+            animation: fadeIn 0.3s ease-out; /* Simple fade-in animation */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            cursor: pointer;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .qr-code-section {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            border: 1px dashed #555;
+        }
+
+        .qr-code-section img {
+            display: block;
+            margin: 0 auto 15px;
+            background-color: #fff; /* QR code background should be white */
+            padding: 10px; /* Padding inside the border */
+            border-radius: 5px; /* Slightly rounded corners for the QR image box */
+        }
+
+        .upi-id-display {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #8a3ffd; /* Highlight UPI ID */
+            margin-bottom: 10px;
+            word-break: break-all; /* Ensure long UPI IDs wrap */
+        }
+
+        .copy-upi-btn {
+            background-color: #8a3ffd;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-top: 5px;
+            transition: background-color 0.2s ease;
+        }
+
+        .copy-upi-btn:hover {
+            background-color: #6a2cbd;
+        }
+
+        #iHavePaidButton {
+            background-color: #4CAF50; /* Green button for confirmation */
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        #iHavePaidButton:hover {
+            background-color: #45a049;
+        }
+
+        .warning-text {
+            color: #ffda6a; /* Yellowish warning text */
+            font-size: 0.9em;
+            margin-top: 15px;
+        }
+
+        /* Ensure existing buttons match this style if you want consistency */
+        .main-button {
+            display: block;
+            width: fit-content;
+            margin: 15px auto;
+            padding: 10px 20px;
+            background-color: #8a3ffd; /* Example: your theme color */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            text-align: center;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+        }
+        .main-button:hover {
+            background-color: #6a2cbd;
+        }
+    </style>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-fire fa-2x" style="color: #8a3ffd;"></i>
+                <h1>FreeFire Tournaments</h1>
+            </div>
+            <nav>
+    <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="tournament.html">Tournaments</a></li>
+        <li><a href="rewards.html">Rewards</a></li>
+        <li><a href="Contact.html">Contact</a></li> <!-- Add this line -->
+        <li><a href="Wallet.html">Wallet</a></li>
+    </ul>
+</nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Auth Forms -->
+        <div id="authSection">
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="loginTab">Login</div>
+                <div class="auth-tab" id="signupTab">Sign Up</div>
+            </div>
+            
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password">
+                </div>
+                <button class="auth-btn" id="loginBtn">Login</button>
+                <div class="auth-message" id="loginMessage"></div>
+            </div>
+            
+            <!-- Signup Form -->
+            <div id="signupForm" class="auth-form" style="display: none;">
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" placeholder="Create a password">
+                </div>
+                <button class="auth-btn" id="signupBtn">Sign Up</button>
+                <div class="auth-message" id="signupMessage"></div>
+            </div>
+        </div>
+
+        <!-- Tournament Form (Initially Hidden) -->
+        <main id="tournamentContainer" style="display:none;">
+            <div class="page-header">
+                <h1>🔥 FreeFire Tournament Registration</h1>
+                <p>Register & Win Cash Prizes</p>
+            </div>
+
+            <!-- Mode Selection -->
+            <section class="mode-selection">
+                <h2>Select Tournament Mode</h2>
+                <div class="mode-options">
+
+                    <!-- Solo -->
+                    <div class="mode-card active" data-mode="solo" data-fee="30">
+                        
+                        <div class="mode-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3>BR Solo</h3>
+                        <div class="fee">₹30</div>
+                        <p>Individual player registration</p>
+                        <div class="players-info">1 Player</div>
+                    </div>
+
+                    <!-- Squad -->
+                    <div class="mode-card" data-mode="squad" data-fee="120">
+                        
+                        <div class="mode-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>BR Squad</h3>
+                        <div class="fee">₹120</div>
+                        <p>Team registration (4 players)</p>
+                        <div class="players-info">4 Players</div>
+                    </div>
+
+                    <!-- CS Custom -->
+                    <div class="mode-card" data-mode="cs" data-fee="120">
+                        
+                        <div class="mode-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>CS Custom</h3>
+                        <div class="fee">₹120</div>
+                        <p>Team registration (4 players)</p>
+                        <div class="players-info">4 Players</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Image Border Container (for AI-generated images) -->
+            <!-- This is where any AI-generated images will appear with the defined border -->
+            <div class="image-border-container">
+                <p style="color: #b0b0c0; text-align: center;">Your AI-generated image would appear here.</p>
+                <!-- Example: If I generated an image, it would replace this comment with an <img> tag -->
+                <!-- <img> -->
+            </div>
+
+
+            <!-- Registration Form -->
+            <section class="registration-form">
+                <h2>Player Details - <span id="selectedMode">Solo</span></h2>
+
+                <div class="form-instructions">
+                    <p><i class="fas fa-info-circle"></i> Fill in all required details accurately. Incorrect information may lead to disqualification.</p>
+                </div>
+
+                <form id="tournamentForm">
+                    <!-- Solo Fields -->
+                    <div class="form-section solo-fields">
+                        <div class="input-group">
+                            <label for="playerName">Game me jo naam hai<span class="required">*</span></label>
+                            <input type="text" id="playerName" placeholder="Your exact FreeFire game name" required>
+                            <small>Enter your exact FreeFire game name as it appears in the game</small>
+                        </div>
+                        <div class="input-group">
+                            <label for="mobile">Mobile Number <span class="required">*</span></label>
+                            <input type="tel" id="mobile" placeholder="Your active mobile number" required>
+                            <small>We'll contact you on this number for tournament updates</small>
+                        </div>
+                    </div>
+
+                    <!-- Squad/CS Fields -->
+                    <div class="form-section squad-fields" style="display:none;">
+                        <div class="team-leader-section">
+                            <h4><i class="fas fa-trophy"></i> Team Details</h4>
+                             <div class="input-group">
+                                <label for="teamName">Team Name <span class="required">*</span></label>
+                                <input type="text" id="teamName" placeholder="Your Team's Name" required>
+                                <small>Choose a unique name for your squad.</small>
+                            </div>
+                            <h4><i class="fas fa-crown"></i> Team Leader Details</h4>
+                            <div class="input-group">
+                                <label for="teamLeaderName">Team Leader Game Name <span class="required">*</span></label>
+                                <input type="text" id="teamLeaderName" placeholder="Team Leader Game Name" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="teamMobile">Team Leader Mobile <span class="required">*</span></label>
+                                <input type="tel" id="teamMobile" placeholder="Team Leader Mobile" required>
+                            </div>
+                        </div>
+                        
+                        <div class="teammates-section">
+                            <h4><i class="fas fa-users"></i> Teammates Details (Game Names)</h4>
+                            <div class="players-grid">
+                                <div class="input-group">
+                                    <label for="player1">Player 2 Game Name <span class="required">*</span></label>
+                                    <input type="text" id="player1" placeholder="Player 2 Game Name" required>
+                                </div>
+                                <div class="input-group">
+                                    <label for="player2">Player 3 Game Name <span class="required">*</span></label>
+                                    <input type="text" id="player2" placeholder="Player 3 Game Name" required>
+                                </div>
+                                <div class="input-group">
+                                    <label for="player3">Player 4 Game Name <span class="required">*</span></label>
+                                    <input type="text" id="player3" placeholder="Player 4 Game Name" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Summary -->
+                    <div class="payment-summary">
+                        <h3><i class="fas fa-receipt"></i> Payment Summary</h3>
+                        <div class="summary-item">
+                            <span>Entry Fee:</span>
+                            <span id="entryFeeDisplay">₹30</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Processing Fee:</span>
+                            <span>₹10</span>
+                        </div>
+                        <div class="summary-item total">
+                            <span>Total Amount:</span>
+                            <span id="totalAmount">₹40</span>
+                        </div>
+                    </div>
+
+                    <button type="button" id="payButton" class="pay-button">
+                        <i class="fas fa-lock"></i> Pay & Register
+                    </button>
+                </form>
+            </section>
+
+            <!-- Success Message -->
+            <div class="success-message" id="successMessage" style="display:none;">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3>Registration Successful!</h3>
+                <p id="successDetails">Your registration for Solo mode has been confirmed.</p>
+                <button onclick="resetTournamentForm()" class="success-btn">
+                   <i class="fas fa-plus"></i> Register Another
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>FreeFire Tournaments</h3>
+                    <p>Join the ultimate competitive platform for FreeFire players. Show your skills, win prizes, and become a champion!</p>
+                    <div class="social-icons">
+                        <a href="https://facebook.com" class="facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://youtube.com" class="youtube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <a href="https://whatsapp.com/channel/0029Vb72lw9JuyAJ9m3hOE1m" class="whatsapp">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="https://instagram.com" class="instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                       <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="tournament.html">Tournaments</a></li>
+        <li><a href="rewards.html">Rewards</a></li>
+        <li><a href="registrations.html">Registrations</a></li> <!-- Add this line -->
+        <li><a href="contact.html">Contact</a></li>
+    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; Organised by 1st Semester Students.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Payment Modal HTML -->
+    <div id="qrPaymentModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeQrModal">&times;</span>
+            <h2>Complete Your Payment</h2>
+            <p>Please scan the QR code or use the UPI ID below to pay **₹<span id="qrAmount"></span>**.</p>
+            <p>Your registration will be confirmed *after* you click "I have Paid" below.</p>
+
+            <div class="qr-code-section">
+                <!-- !!! IMPORTANT: REPLACE THIS WITH YOUR ACTUAL QR CODE IMAGE URL !!! -->
+                <img src="/photos/Paytm_QR.png" width="300" alt="UPI QR Code" id="qrCodeImage">50px
+                <p>Or use UPI ID:</p>
+                <!-- !!! IMPORTANT: REPLACE THIS WITH YOUR ACTUAL UPI ID !!! -->
+                <p class="upi-id-display">sankinx@ptyes</p>
+                <button class="copy-upi-btn" onclick="copyToClipboard('sankinx@ptyes')">Copy UPI ID</button>
+            </div>
+
+            <button id="iHavePaidButton" class="main-button">I have Paid</button>
+            <a id="payWithUpiApp" class="main-button" style="background-color: #007bff; margin-top: 15px; display: none;" target="_blank">Pay with UPI App (Mobile)</a>
+
+            <div id="paymentInstructions">
+                <p><strong>Instructions:</strong></p>
+                <ol>
+                    <li>Open any UPI app (Paytm, GPay, PhonePe, etc.).</li>
+                    <li>Scan the QR code or enter the UPI ID.</li>
+                    <li>Enter the exact amount: ₹<span id="qrAmountInstructions"></span></li>
+                    <li>Complete the payment.</li>
+                    <li>Once successful, click the "I have Paid" button above.</li>
+                </ol>
+                <p class="warning-text"><strong>Important:</strong> Only click "I have Paid" *after* your payment is successful to ensure your registration is processed correctly. Your registration status will be "Pending Verification".</p>
+            </div>
+        </div>
+    </div>
+<script>
+
+    // ===================
+// // ===================
+// Firebase Config
+// ===================
+const firebaseConfig = {
+    apiKey: "AIzaSyDDuqLprmwkAXPHxyft31Nf_XnM3JaFgnI",
+    authDomain: "ffmax-1a509.firebaseapp.com",
+    // databaseURL is for Realtime Database, not needed for Firestore directly in config
+    projectId: "ffmax-1a509",
+    storageBucket: "ffmax-1a509.appspot.com",
+    messagingSenderId: "216916500863",
+    appId: "1:216916500863:web:9f7006952cf6a6e75dba4b",
+    measurementId: "G-61W6JSW0XB"
+};
+
+// Initialize Firebase only if it hasn't been initialized already
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+
+const auth = firebase.auth();
+const db = firebase.firestore(); // Firestore instance
+// const database = firebase.database(); // Realtime Database removed
+
+// ===================
+// DOM Elements
+// ===================
+const loginTab = document.getElementById("loginTab");
+const signupTab = document.getElementById("signupTab");
+const loginForm = document.getElementById("loginForm");
+const signupForm = document.getElementById("signupForm");
+const loginBtn = document.getElementById("loginBtn");
+const signupBtn = document.getElementById("signupBtn");
+const loginMessage = document.getElementById("loginMessage");
+const signupMessage = document.getElementById("signupMessage");
+
+const tournamentContainer = document.getElementById("tournamentContainer");
+const modeCards = document.querySelectorAll(".mode-card");
+const selectedModeSpan = document.getElementById("selectedMode");
+const soloFields = document.querySelector(".solo-fields");
+const squadFields = document.querySelector(".squad-fields");
+const payButton = document.getElementById("payButton");
+const entryFeeDisplay = document.getElementById("entryFeeDisplay");
+const totalAmount = document.getElementById("totalAmount");
+
+const successMessage = document.getElementById("successMessage");
+const successDetails = document.getElementById("successDetails");
+
+let selectedMode = "solo";
+let entryFee = 30;
+
+// ===================
+// New DOM Elements for QR Payment Modal
+// (Ensure these IDs are present in your HTML modal structure)
+// ===================
+const qrPaymentModal = document.getElementById("qrPaymentModal");
+const closeQrModal = document.getElementById("closeQrModal");
+const qrAmount = document.getElementById("qrAmount");
+const qrAmountInstructions = document.getElementById("qrAmountInstructions"); 
+const iHavePaidButton = document.getElementById("iHavePaidButton");
+const upiIdDisplay = document.querySelector(".upi-id-display"); 
+const payWithUpiApp = document.getElementById("payWithUpiApp"); 
+
+let currentFormData = null; 
+
+// ===================
+// Auth Tab Switching
+// ===================
+loginTab.addEventListener("click", () => {
+    loginTab.classList.add("active");
+    signupTab.classList.remove("active");
+    loginForm.style.display = "flex";
+    signupForm.style.display = "none";
+    loginMessage.textContent = ""; 
+    signupMessage.textContent = "";
+});
+
+signupTab.addEventListener("click", () => {
+    signupTab.classList.add("active");
+    loginTab.classList.remove("active");
+    signupForm.style.display = "flex";
+    loginForm.style.display = "none";
+    loginMessage.textContent = ""; 
+    signupMessage.textContent = "";
+});
+
+// ===================
+// Auth Functions
+// ===================
+loginBtn.addEventListener("click", async () => {
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+    try {
+        await auth.signInWithEmailAndPassword(email, password);
+        loginMessage.textContent = "Login successful!";
+        loginMessage.className = "auth-message success";
+        tournamentContainer.style.display = "block";
+        document.getElementById("authSection").style.display = "none";
+    } catch (error) {
+        loginMessage.textContent = error.message;
+        loginMessage.className = "auth-message error";
+    }
+});
+
+signupBtn.addEventListener("click", async () => {
+    const email = document.getElementById("signupEmail").value;
+    const password = document.getElementById("signupPassword").value;
+    try {
+        await auth.createUserWithEmailAndPassword(email, password);
+        signupMessage.textContent = "Signup successful!";
+        signupMessage.className = "auth-message success";
+        tournamentContainer.style.display = "block";
+        document.getElementById("authSection").style.display = "none";
+    } catch (error) {
+        signupMessage.textContent = error.message;
+        signupMessage.className = "auth-message error";
+    }
+});
+
+// ===================
+// Check Login State
+// ===================
+auth.onAuthStateChanged(user => {
+    if (user) {
+        tournamentContainer.style.display = "block";
+        document.getElementById("authSection").style.display = "none";
+    } else {
+        tournamentContainer.style.display = "none";
+        document.getElementById("authSection").style.display = "block";
+    }
+});
+
+// ===================
+// Mode Selection
+// ===================
+modeCards.forEach(card => {
+    card.addEventListener("click", () => {
+        modeCards.forEach(c => c.classList.remove("active"));
+        card.classList.add("active");
+
+        selectedMode = card.dataset.mode;
+        entryFee = parseInt(card.dataset.fee);
+
+        selectedModeSpan.textContent = selectedMode.toUpperCase();
+        entryFeeDisplay.textContent = `₹${entryFee}`;
+        totalAmount.textContent = `₹${entryFee + 10}`; 
+
+        soloFields.style.display = selectedMode === "solo" ? "block" : "none";
+        squadFields.style.display = selectedMode !== "solo" ? "block" : "none";
+    });
+});
+
+// Set initial mode on page load
+document.querySelector(".mode-card[data-mode='solo']").click();
+
+
+// ===================
+// Mobile Validation
+// ===================
+function validateMobile(number) {
+    return /^[6-9]\d{9}$/.test(number);
+}
+
+// ===================
+// Reset Form
+// ===================
+function resetTournamentForm() {
+    document.getElementById("tournamentForm").reset();
+    successMessage.style.display = "none";
+    tournamentContainer.style.display = "block";
+    selectedMode = "solo";
+    modeCards.forEach(c => c.classList.remove("active"));
+    document.querySelector(".mode-card[data-mode='solo']").classList.add("active");
+    selectedModeSpan.textContent = "SOLO";
+    entryFee = 30; // Reset to default solo fee
+    entryFeeDisplay.textContent = `₹${entryFee}`;
+    totalAmount.textContent = `₹${entryFee + 10}`;
+    soloFields.style.display = "block";
+    squadFields.style.display = "none";
+}
+
+// ===================
+// Collect Form Data
+// ===================
+function collectFormData() {
+    if (!auth.currentUser) {
+        alert("Please login first!");
+        return null;
+    }
+
+    const data = { 
+        mode: selectedMode, 
+        userEmail: auth.currentUser.email,
+        userId: auth.currentUser.uid // User ID bhi store kar sakte hain
+    };
+
+    if (selectedMode === "solo") {
+        const playerName = document.getElementById("playerName").value.trim();
+        const mobile = document.getElementById("mobile").value.trim();
+        if (!playerName || !mobile) {
+            alert("Please fill all solo player fields!");
+            return null;
+        }
+        if (!validateMobile(mobile)) {
+            alert("Please enter a valid 10-digit mobile number for the solo player!");
+            return null;
+        }
+        data.players = [{ name: playerName, mobile }];
+    } else { // Squad or other team modes
+        const teamName = document.getElementById("teamName").value.trim(); 
+        const leaderName = document.getElementById("teamLeaderName").value.trim();
+        const leaderMobile = document.getElementById("teamMobile").value.trim();
+        const player1 = document.getElementById("player1").value.trim();
+        const player2 = document.getElementById("player2").value.trim();
+        const player3 = document.getElementById("player3").value.trim();
+
+        if (!teamName || !leaderName || !leaderMobile || !player1 || !player2 || !player3) {
+            alert("Please fill all squad player fields!");
+            return null;
+        }
+        if (!validateMobile(leaderMobile)) {
+            alert("Please enter a valid 10-digit mobile number for the team leader!");
+            return null;
+        }
+
+        data.teamName = teamName;
+        data.players = [
+            { name: leaderName, mobile: leaderMobile, role: "Leader" },
+            { name: player1, role: "Player 1" },
+            { name: player2, role: "Player 2" },
+            { name: player3, role: "Player 3" }
+        ];
+    }
+
+    data.amount = entryFee + 10; 
+    data.timestamp = firebase.firestore.FieldValue.serverTimestamp(); // Firestore timestamp
+    data.paymentStatus = "Pending Verification (QR/UPI)"; 
+    return data;
+}
+
+// ===================
+// Save to Firestore
+// ===================
+async function saveToFirestore(data) {
+    try {
+        // 'registrations' ek collection hai, aur Firestore auto-ID generate karega
+        // Hum chahein toh sub-collections bhi bana sakte hain jaise
+        // db.collection('registrations').doc(selectedMode).collection('entries').add(data)
+        // Lekin simple rakhne ke liye, main registrations/docId structure use kar raha hoon.
+        await db.collection('registrations').add(data);
+        console.log("Registration data saved to Firestore successfully!");
+    } catch (error) {
+        alert("Error saving registration data to Firestore!");
+        console.error("Firestore Save Error:", error);
+    }
+}
+
+// ===================
+// Copy UPI ID to Clipboard
+// ===================
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert("UPI ID copied to clipboard!");
+    }).catch(err => {
+        console.error('Failed to copy text: ', err);
+        alert("Failed to copy UPI ID.");
+    });
+}
+
+// Attach copyToClipboard function to the global window object
+window.copyToClipboard = copyToClipboard;
+
+// ===================
+// Pay & Register (Modified for QR Code/UPI)
+// ===================
+payButton.addEventListener("click", async () => {
+    const formData = collectFormData();
+    if (!formData) return; 
+
+    currentFormData = formData;
+
+    qrAmount.textContent = formData.amount;
+    qrAmountInstructions.textContent = formData.amount; 
+
+    const actualUpiId = upiIdDisplay ? upiIdDisplay.textContent : 'your_upi_id@bank'; // Replace with your actual UPI ID in HTML
+    if (payWithUpiApp) {
+        payWithUpiApp.style.display = "block"; 
+        payWithUpiApp.href = `upi://pay?pa=${actualUpiId}&pn=FFMAX_Tournament&am=${formData.amount}&cu=INR&tn=FF_Reg_${selectedMode}`;
+    }
+
+    qrPaymentModal.style.display = "flex"; 
+});
+
+// ===================
+// Modal Close Button
+// ===================
+closeQrModal.addEventListener("click", () => {
+    qrPaymentModal.style.display = "none";
+    currentFormData = null; 
+    if (payWithUpiApp) payWithUpiApp.style.display = "none"; 
+});
+
+// Close modal if user clicks outside of it (optional)
+window.addEventListener("click", (event) => {
+    if (event.target == qrPaymentModal) {
+        qrPaymentModal.style.display = "none";
+        currentFormData = null;
+        if (payWithUpiApp) payWithUpiApp.style.display = "none"; 
+    }
+});
+
+// ===================
+// I Have Paid Button
+// ===================
+iHavePaidButton.addEventListener("click", async () => { // Made async here
+    if (currentFormData) {
+        await saveToFirestore(currentFormData); // Call async function
+
+        qrPaymentModal.style.display = "none"; 
+        tournamentContainer.style.display = "none"; 
+
+        successMessage.style.display = "block";
+        successDetails.textContent = `Your registration for ${currentFormData.mode.toUpperCase()} mode has been confirmed. Your payment is Pending Verification. Please check your registered email for updates.`;
+        
+        payButton.disabled = false;
+        payButton.textContent = "Pay & Register";
+        resetTournamentForm(); 
+        currentFormData = null; 
+        if (payWithUpiApp) payWithUpiApp.style.display = "none"; 
+    } else {
+        alert("No registration data found. Please try again.");
+        qrPaymentModal.style.display = "none";
+        if (payWithUpiApp) payWithUpiApp.style.display = "none"; 
+        resetTournamentForm(); 
+    }
+});
+
+// No need for document.addEventListener("DOMContentLoaded", fetchRegistrations); here
+// as this file is for registration, not for fetching and displaying the list.
+// If you want to fetch and display after registration, you'd call a fetch function here.
+</script>
+</body>
+</html>

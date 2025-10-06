@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Updated viewport meta tag for fixed scale and no zoom -->
+    <meta name="viewport" content="width=device-width, initial-scale=0.65, maximum-scale=0.65, user-scalable=no">
+    <title>Registered Players - FreeFire Tournaments</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+    <!-- Internal CSS for this page (can be moved to style.css) -->
+    <style>
+        /* Yahan aapke saare existing CSS styles hain */
+        /* ... (Your existing CSS for filters-section, registered-players-list, etc.) ... */
+        /*
+         * Main container width adjustment for smaller scale
+         * Agar aapka .container pehle se hi responsive hai to shayad iski zaroorat na pade.
+         * Agar aapka .container fixed width ka hai, toh yeh help kar sakta hai.
+         */
+        body {
+            /* Yeh overflow-x hidden horizontal scrolling ko force karega */
+            overflow-x: hidden; 
+        }
+
+        .container {
+            /* Agar aapka container fixed width ka hai aur 0.65 scale par bahar jaa raha hai, 
+               toh uski max-width ko thoda adjust karein ya responsive banayein */
+            max-width: 100%; /* Ensure it doesn't try to be wider than its parent */
+            padding: 0 10px; /* Thodi padding de taki edges cut na ho */
+            box-sizing: border-box; /* Padding include ho width mein */
+        }
+
+        /* Responsive adjustments for table if it's too wide at 0.65 scale */
+        @media (max-width: 768px) { /* Adjust this breakpoint as needed */
+            #playersTable {
+                display: block; /* Table ko block element banao responsive banane ke liye */
+                overflow-x: auto; /* Horizontal scrollbar table ke andar hi rahegi */
+                white-space: nowrap; /* Table content ko wrap hone se roko */
+            }
+
+            #playersTable thead, #playersTable tbody, #playersTable th, #playersTable td, #playersTable tr {
+                display: block;
+            }
+            #playersTable tr {
+                margin-bottom: 10px;
+                border: 1px solid #444;
+                border-radius: 5px;
+            }
+            #playersTable td {
+                /* Smaartphone view ke liye har cell ko ek row ki tarah dekhe */
+                border-bottom: 1px solid #555;
+                text-align: right;
+                padding-left: 50%; /* Label ke liye space */
+                position: relative;
+            }
+            #playersTable td::before {
+                /* Table header labels ko pseudo-elements se dikhao */
+                position: absolute;
+                left: 15px;
+                width: calc(50% - 30px);
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+                color: #8a3ffd;
+            }
+            /* Har cell ke liye specific content-label */
+            #playersTable td:nth-of-type(1)::before { content: "Mode:"; }
+            #playersTable td:nth-of-type(2)::before { content: "Name / Team Name:"; }
+            #playersTable td:nth-of-type(3)::before { content: "Mobile:"; }
+            #playersTable td:nth-of-type(4)::before { content: "Other Players:"; }
+            #playersTable td:nth-of-type(5)::before { content: "Amount:"; }
+            #playersTable td:nth-of-type(6)::before { content: "Status:"; }
+            #playersTable td:nth-of-type(7)::before { content: "Registered On:"; }
+
+            /* Hide table headers in mobile view */
+            #playersTable thead {
+                display: none;
+            }
+        }
+
+        /* Existing CSS for filter section */
+        .filters-section {
+            background-color: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filters-section h2 {
+            width: 100%;
+            color: #eee;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 180px; /* Minimum width for filter groups */
+        }
+
+        .filter-group label {
+            color: #ccc;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .filters-section select,
+        .filters-section input[type="text"] {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #555;
+            background-color: #3e3e3e;
+            color: #eee;
+            font-size: 1em;
+            width: 100%;
+            box-sizing: border-box; /* Include padding in width */
+        }
+
+        .filters-section select option {
+            background-color: #3e3e3e; /* Ensure options match dark theme */
+            color: #eee;
+        }
+
+        .filters-section button {
+            background-color: #8a3ffd;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s ease;
+            align-self: flex-end; /* Align to the bottom of the group */
+        }
+
+        .filters-section button:hover {
+            background-color: #6a2cbd;
+        }
+
+        /* Registered Players List */
+        .registered-players-list {
+            background-color: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .registered-players-list h2 {
+            color: #eee;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        #playersTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        #playersTable th,
+        #playersTable td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+            color: #ccc;
+        }
+
+        #playersTable th {
+            background-color: #3e3e3e;
+            color: #fff;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+
+        #playersTable tr:last-child td {
+            border-bottom: none;
+        }
+
+        #playersTable tbody tr:hover {
+            background-color: #333;
+        }
+
+        .no-records {
+            text-align: center;
+            color: #aaa;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        .loading-message {
+            text-align: center;
+            padding: 20px;
+            color: #8a3ffd;
+            font-size: 1.1em;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-fire fa-2x" style="color: #8a3ffd;"></i>
+                <h1>FreeFire Tournaments</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="tournament.html">Tournaments</a></li>
+                    <li><a href="rewards.html">Rewards</a></li>
+                    <li><a href="registrations.html" class="active">Registrations</a></li> <!-- Link to this new page -->
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <main>
+            <div class="page-header">
+                <h1>Registered Players</h1>
+                <p>View all participants for upcoming tournaments.</p>
+            </div>
+
+            <!-- Filters Section -->
+            <section class="filters-section">
+                <h2><i class="fas fa-filter"></i> Filter Registrations</h2>
+                
+                <div class="filter-group">
+                    <label for="modeFilter">Mode</label>
+                    <select id="modeFilter">
+                        <option value="all">All Modes</option>
+                        <option value="solo">BR Solo</option>
+                        <option value="squad">BR Squad</option>
+                        <option value="cs">CS Custom</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="sortOrder">Sort By Name</label>
+                    <select id="sortOrder">
+                        <option value="default">Default</option>
+                        <option value="asc">A-Z (Ascending)</option>
+                        <option value="desc">Z-A (Descending)</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="nameSearch">Search by Name/Mobile</label>
+                    <input type="text" id="nameSearch" placeholder="Search player/team name or mobile">
+                </div>
+
+                <button id="applyFiltersBtn">Apply Filters</button>
+            </section>
+
+            <!-- Registered Players List Section -->
+            <section class="registered-players-list">
+                <h2><i class="fas fa-list-alt"></i> Player List</h2>
+                <p id="loadingMessage" class="loading-message">Loading registrations...</p>
+                <div id="playersListContainer">
+                    <table id="playersTable">
+                        <thead>
+                            <tr>
+                                <th>Mode</th>
+                                <th>Name / Team Name</th>
+                                <th>Mobile</th>
+                                <th>Other Players</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Registered On</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Player data will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                    <p id="noRecordsMessage" class="no-records" style="display:none;">No registrations found matching your criteria.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>FreeFire Tournaments</h3>
+                    <p>Join the ultimate competitive platform for FreeFire players. Show your skills, win prizes, and become a champion!</p>
+                    <div class="social-icons">
+                        <a href="https://facebook.com" class="facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://youtube.com" class="youtube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <a href="https://whatsapp.com/channel/0029Vb72lw9JuyAJ9m3hOE1m" class="whatsapp">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="https://instagram.com" class="instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                       <ul>
+                           <li><a href="index.html">Home</a></li>
+                           <li><a href="tournament.html">Tournaments</a></li>
+                           <li><a href="rewards.html">Rewards</a></li>
+                           <li><a href="registrations.html">Registrations</a></li> <!-- Add this line -->
+                           <li><a href="contact.html">Contact</a></li>
+                       </ul>
+                </div>
+            <div class="copyright">
+                <p>&copy; Organised by 1st Semester Students.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="registrations.js"></script>
+</body>
+</html>
